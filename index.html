@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>أكاديمية الدعم الفني</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ترويسة + شريط المراحل الخمس + لوحة عمل واحدة تتبدل حسب المرحلة، بطابع غرفة مراقبة الشبكة */
+:root{
+  --bg:#eef3f4; --surface:#ffffff; --surface2:#e6eef0; --ink:#10222a; --muted:#566b75; --line:#cfdce0;
+  --accent:#0a766f; --accent-ink:#ffffff; --accent-soft:#d3ece9;
+  --good:#1a7a43; --good-soft:#d8efe1; --bad:#b3261e; --bad-soft:#f7dedb; --warn:#8f5200; --warn-soft:#f8e8cc;
+  --term-bg:#0b1519; --term-ink:#c8e6e2; --term-dim:#6f9a98;
+  --f-body:'IBM Plex Sans Arabic',system-ui,sans-serif; --f-head:'Readex Pro','IBM Plex Sans Arabic',system-ui,sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1a20; --surface:#13262e; --surface2:#1a3039; --ink:#e4eff1; --muted:#93a9b2; --line:#27414b;
+  --accent:#42c6bc; --accent-ink:#052421; --accent-soft:#17403f;
+  --good:#52c783; --good-soft:#14392a; --bad:#ff8a80; --bad-soft:#40201e; --warn:#f0b455; --warn-soft:#3e3017;
+  --term-bg:#071014; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0c1a20; --surface:#13262e; --surface2:#1a3039; --ink:#e4eff1; --muted:#93a9b2; --line:#27414b;
+  --accent:#42c6bc; --accent-ink:#052421; --accent-soft:#17403f;
+  --good:#52c783; --good-soft:#14392a; --bad:#ff8a80; --bad-soft:#40201e; --warn:#f0b455; --warn-soft:#3e3017;
+  --term-bg:#071014; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-head);line-height:1.35;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.5rem,4.5vw,2.1rem)}
+h2{font-size:1.35rem} h3{font-size:1.05rem}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.hdr{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;padding-bottom:16px}
+.hdr p{color:var(--muted);max-width:60ch}
+.overall{min-width:200px}
+.overall small{color:var(--muted);display:block}
+.meter{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:6px}
+.meter>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s}
+
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:8px;margin-block:4px 18px}
+.ph{display:flex;gap:10px;align-items:center;text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.ph .n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-family:var(--f-head);font-weight:700;font-size:.9rem}
+.ph b{display:block;font-size:.92rem;line-height:1.3}
+.ph span.s{font-size:.78rem;color:var(--muted)}
+.ph[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.ph[aria-current="true"] .n{background:var(--accent);color:var(--accent-ink)}
+.ph.done .n{background:var(--good);color:var(--bg)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(14px,3vw,26px)}
+.lead{color:var(--muted);margin-top:4px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.box{background:var(--surface2);border-radius:10px;padding:12px 14px;min-width:0}
+.box h3{font-size:.95rem;margin-bottom:6px;color:var(--accent)}
+.box ul,.box ol{margin:0;padding-inline-start:20px}
+.box li{margin-block:2px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 12px;font-size:.88rem;background:var(--surface)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab .ok{margin-inline-start:6px}
+
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:9px 20px;font-weight:600}
+.btn.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:right;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.good{border-color:var(--good);background:var(--good-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.fb{border-radius:10px;padding:10px 14px;font-size:.95rem}
+.fb.good{background:var(--good-soft);color:var(--ink);border:1px solid var(--good)}
+.fb.bad{background:var(--bad-soft);color:var(--ink);border:1px solid var(--bad)}
+.fb.info{background:var(--warn-soft);border:1px solid var(--warn)}
+
+.ticket{border:1px dashed var(--accent);border-radius:12px;padding:12px 16px;background:var(--surface)}
+.ticket .meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--muted);font-family:var(--f-mono);direction:ltr;justify-content:flex-end}
+.ticket q{display:block;margin-top:6px;quotes:none;font-weight:500}
+
+.anim{background:var(--surface2);border-radius:12px;padding:8px;display:grid;place-items:center}
+.anim svg{width:100%;max-width:420px;height:auto}
+.anim figcaption,.anim .cap{font-size:.82rem;color:var(--muted);text-align:center}
+figure{margin:0}
+svg .box-f{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+svg .ln{stroke:var(--ink);stroke-width:2.5;fill:none;stroke-linecap:round}
+svg .arc{stroke:var(--accent);stroke-width:4;fill:none;stroke-linecap:round;opacity:.15;animation:pulse 1.8s infinite}
+svg .arc.a2{animation-delay:.3s} svg .arc.a3{animation-delay:.6s}
+svg .dash{stroke:var(--muted);stroke-width:2;stroke-dasharray:6 6;fill:none;animation:flow 1s linear infinite}
+svg .bad{fill:var(--bad)} svg .goodf{fill:var(--good)} svg .acc{fill:var(--accent)}
+svg text{fill:var(--ink);font-family:var(--f-body);font-size:12px;text-anchor:middle}
+svg text.w{fill:#fff;font-weight:700;font-size:14px}
+svg .blink{animation:blink 1.1s steps(2,start) infinite}
+svg .key{animation:key 2.6s ease-in-out infinite}
+svg .paper{animation:paper 2.4s ease-in-out infinite}
+svg .pkt{fill:var(--accent);animation:travel 3s linear infinite}
+svg .pkt.p2{animation-delay:1.5s}
+@keyframes pulse{0%,100%{opacity:.15}40%{opacity:1}}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@keyframes blink{50%{opacity:0}}
+@keyframes key{0%{transform:translateX(0)}55%,100%{transform:translateX(54px)}}
+@keyframes paper{0%{transform:translateY(-18px);opacity:0}30%{opacity:1}100%{transform:translateY(16px);opacity:1}}
+@keyframes travel{from{transform:translateX(0)}to{transform:translateX(240px)}}
+@media (prefers-reduced-motion:reduce){svg *{animation:none!important}svg .arc{opacity:1}}
+
+.term{direction:ltr;text-align:left;background:var(--term-bg);color:var(--term-ink);font-family:var(--f-mono);font-size:.85rem;border-radius:10px;padding:12px;height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.term .p{color:var(--term-dim)} .term .er{color:#ff8a80} .term .okc{color:#7be0a1}
+.cmdline{direction:ltr;display:flex;gap:8px;margin-top:8px}
+.cmdline input{flex:1;min-width:0;background:var(--term-bg);color:var(--term-ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:var(--f-mono);font-size:.9rem}
+.chk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.chk li{display:flex;gap:10px;align-items:center}
+.chk i{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:.8rem}
+.chk li.on i{background:var(--good);border-color:var(--good);color:var(--bg)}
+.chk li.on{color:var(--ink)} .chk li{color:var(--muted)}
+
+.prog{font-size:.85rem;color:var(--muted)}
+.skills{display:flex;flex-direction:column;gap:12px}
+.sk{display:grid;grid-template-columns:minmax(120px,190px) 1fr 70px;gap:10px;align-items:center}
+.sk .b{height:12px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.sk .b i{display:block;height:100%;border-radius:99px}
+.lvl{font-size:.8rem;font-weight:600;text-align:left}
+.verdict{border-radius:12px;padding:14px 18px;border:2px solid}
+.verdict.ready{border-color:var(--good);background:var(--good-soft)}
+.verdict.notyet{border-color:var(--warn);background:var(--warn-soft)}
+.pill-g{color:var(--good)} .pill-w{color:var(--warn)} .pill-b{color:var(--bad)}
+@media (max-width:520px){.sk{grid-template-columns:1fr 60px}.sk .b{grid-column:1/-1;order:3}}
+</style>
+</head>
+<body>
+
+<div class="wrap" dir="rtl" lang="ar">
+  <header class="hdr">
+    <div>
+      <h1>أكاديمية الدعم الفني</h1>
+      <p>برنامج تأهيل موظفي الدعم الفني الجدد في الجامعة. تنتهي الرحلة بقدرتك على استقبال البلاغ، وتشخيصه، ومعالجته باستقلال، وتحديد متى تصعّده.</p>
+    </div>
+    <div class="overall"><small id="ovtxt">التقدم العام: 0 من 5 مراحل</small><div class="meter"><i id="ovbar" style="width:0%"></i></div></div>
+  </header>
+  <nav class="phases" id="nav" aria-label="مراحل البرنامج"></nav>
+  <main class="panel" id="view" aria-live="polite"></main>
+</div>
+
+<script>
+/* ============ بيانات ============ */
+var SK={net:'الشبكات',sec:'الحسابات والأمن',hw:'الأجهزة والطابعات',method:'منهجية التشخيص',comm:'التواصل مع المستفيد',esc:'قرار التصعيد'};
+var PH=[
+ {n:1,t:'التعلم النظري',s:'المشاكل والمصطلحات والأدوات'},
+ {n:2,t:'المحاكاة التفاعلية',s:'بلاغات افتراضية بقرارات'},
+ {n:3,t:'التدريب العملي',s:'جهاز افتراضي آمن'},
+ {n:4,t:'الاختبار والتقييم',s:'سيناريوهات مفاجئة'},
+ {n:5,t:'الاعتماد والجاهزية',s:'تقرير المهارات'}
+];
+
+var TOPICS=[
+ {id:'ip',t:'الاتصال بالشبكة بدون إنترنت',anim:'packets',cap:'الحزمة تنتقل من الجهاز إلى البوابة ثم خادم DNS ثم الموقع. أي حلقة معطلة توقف الرحلة.',
+  sym:['الجهاز متصل لكن المواقع لا تفتح','العنوان يبدأ بـ 169.254','العنوان الرقمي يفتح والاسم لا يفتح'],
+  cause:['خادم DHCP لا يستجيب','كابل أو منفذ معطل','إعدادات DNS خاطئة','البوابة الافتراضية غير صحيحة'],
+  terms:[['IP','عنوان الجهاز على الشبكة'],['DHCP','خدمة تعطي الأجهزة عناوينها تلقائيا'],['DNS','يحوّل اسم الموقع إلى عنوان رقمي'],['Gateway','البوابة التي تخرج منها الحزم إلى خارج الشبكة المحلية'],['APIPA','عنوان 169.254 يعطيه الجهاز لنفسه عند فشل DHCP']],
+  tools:['ipconfig /all','ping','nslookup','tracert'],
+  steps:['اقرأ الإعدادات بالأمر ipconfig','ping 127.0.0.1 لفحص بطاقة الشبكة نفسها','ping للبوابة لفحص الشبكة المحلية','ping 8.8.8.8 لفحص الخروج إلى الإنترنت','nslookup لفحص DNS'],
+  esc:'إذا ظهر العنوان 169.254 على عدة أجهزة في المكان نفسه فالمشكلة غالبا في الشبكة، فصعّد لفريق الشبكات.',
+  ex:'طالب في المعمل يقول إن الإنترنت لا يعمل. ping 8.8.8.8 ينجح لكن nslookup يفشل. إذن الشبكة سليمة والعطل في DNS.',
+  quiz:{skill:'net',q:'ping 8.8.8.8 ينجح لكن فتح موقع بالاسم يفشل. أين المشكلة؟',o:['في خدمة DNS','في كابل الشبكة','في كلمة مرور الحساب','في بطاقة الشبكة'],a:0,why:'نجاح ping لعنوان رقمي يعني أن الاتصال سليم. الفشل مع الأسماء فقط يشير إلى DNS.'}},
+ {id:'wifi',t:'الشبكة اللاسلكية لا تتصل',anim:'wifi',cap:'قوة الإشارة بين نقطة الوصول وجهاز الطالب. عند ضعفها أو تعطل النقطة يتوقف الاتصال.',
+  sym:['شبكة الجامعة لا تظهر في القائمة','الاتصال يتقطع في قاعة محددة','يطلب كلمة المرور مرارا'],
+  cause:['وضع الطيران أو مهايئ معطل','نقطة الوصول بعيدة أو معطلة','بيانات الاعتماد منتهية','ازدحام القناة'],
+  terms:[['SSID','اسم الشبكة اللاسلكية'],['AP','نقطة الوصول اللاسلكية'],['RSSI','قوة الإشارة المستلمة'],['802.1X','مصادقة بحساب المستخدم']],
+  tools:['مؤشر الإشارة في النظام','netsh wlan show interfaces','جهاز آخر للمقارنة'],
+  steps:['تأكد أن الواي فاي مفعّل ووضع الطيران مغلق','قارن بجهاز آخر في المكان نفسه','انسَ الشبكة ثم أعد الاتصال','تحقق من صلاحية كلمة مرور الحساب','إن تكررت في المكان نفسه فاشتبه بنقطة الوصول'],
+  esc:'إذا تأثرت عدة أجهزة في القاعة نفسها فصعّد لفريق الشبكات مع اسم القاعة وعدد الأجهزة.',
+  ex:'طالب في المكتبة لا يتصل، وجهازك المقارن يتصل بسهولة. إذن المشكلة في جهاز الطالب: إعدادات أو بيانات اعتماد.',
+  quiz:{skill:'net',q:'ثلاثة أجهزة في قاعة واحدة لا تتصل بالواي فاي، وجهاز في الممر يتصل. ما الاحتمال الأقوى؟',o:['نقطة الوصول في القاعة معطلة','كلمة مرور كل طالب خاطئة','فيروس في كل جهاز','الإنترنت مقطوع عن الجامعة كلها'],a:0,why:'تأثر عدة أجهزة في مكان واحد مع سلامة جهاز قريب يدل على عطل مشترك محلي، أي نقطة الوصول.'}},
+ {id:'acc',t:'تعذر الدخول إلى الحساب الجامعي',anim:'lock',cap:'تكرار كلمة مرور قديمة محفوظة على جهاز آخر يقفل الحساب بعد عدد محدد من المحاولات.',
+  sym:['رسالة «الحساب مقفل»','كلمة المرور صحيحة لكن الدخول يفشل','القفل يتكرر بعد تغيير كلمة المرور'],
+  cause:['محاولات فاشلة متكررة','كلمة مرور قديمة محفوظة في الهاتف أو البريد','انتهاء صلاحية كلمة المرور','طلب تصيّد كشف بيانات المستخدم'],
+  terms:[['Lockout','قفل الحساب مؤقتا بعد محاولات فاشلة'],['MFA','تحقق بخطوتين'],['SSO','دخول موحد لعدة خدمات'],['Phishing','رسالة مخادعة لسرقة البيانات']],
+  tools:['لوحة إدارة الحسابات','سجل محاولات الدخول','نظام التذاكر'],
+  steps:['تحقق من هوية المستخدم قبل أي إجراء','افحص حالة الحساب وسجل المحاولات','فك القفل أو أعد تعيين كلمة المرور حسب السياسة','اطلب منه تحديث كلمة المرور على كل أجهزته','وثّق الإجراء في التذكرة'],
+  esc:'إذا اشتبهت أن الحساب اختُرق أو أن المستخدم سلّم كلمة مروره لرابط مشبوه فصعّد فورا لفريق أمن المعلومات.',
+  ex:'أستاذة يُقفل حسابها كل أسبوع. تبين أن هاتفها يرسل كلمة المرور القديمة لتطبيق البريد كل بضع دقائق.',
+  quiz:{skill:'sec',q:'يُقفل حساب مستخدم بعد كل تغيير لكلمة المرور. ما أول ما تتحقق منه؟',o:['كلمة مرور قديمة محفوظة على جهاز آخر','تعطل خادم الجامعة','قِدَم جهازه الرئيسي','سرعة الإنترنت لديه'],a:0,why:'القفل المتكرر بعد التغيير هو نمط كلاسيكي لجهاز يواصل إرسال كلمة المرور القديمة.'}},
+ {id:'prn',t:'الطابعة لا تطبع',anim:'printer',cap:'مهمة عالقة في الطابور تمنع ما بعدها رغم أن حالة الطابعة «جاهزة».',
+  sym:['مهام كثيرة في الطابور','الطابعة تظهر «غير متصلة»','تطبع صفحات فارغة أو مشوهة'],
+  cause:['طابور الطباعة عالق','الطابعة غير متصلة بالشبكة','انحشار ورق أو نفاد حبر','برنامج تشغيل غير مناسب'],
+  terms:[['Spooler','خدمة تدير طابور الطباعة في ويندوز'],['Driver','برنامج تعريف الطابعة'],['Queue','طابور مهام الطباعة'],['Toner','حبر الطابعات الليزرية']],
+  tools:['نافذة الطابعات والماسحات','services.msc','ping لعنوان الطابعة'],
+  steps:['افحص شاشة الطابعة للأخطاء','تأكد من اتصالها بالشبكة بالأمر ping','افتح الطابور وامسح المهام العالقة','أعد تشغيل خدمة Print Spooler','أعد تثبيت برنامج التعريف إذا استمر العطل'],
+  esc:'إذا تكرر خطأ الانحشار بعد الفحص الأولي أو ظهر خطأ في الجهاز نفسه فصعّد لقسم الصيانة أو المورد.',
+  ex:'الطابعة تقول «جاهزة» لكن فيها 15 مهمة. بعد مسح الطابور وإعادة تشغيل الخدمة عادت تعمل.',
+  quiz:{skill:'hw',q:'ظهرت 15 مهمة عالقة وحالة الطابعة «جاهزة». ما الخطوة المنطقية؟',o:['مسح الطابور وإعادة تشغيل Print Spooler','استبدال الطابعة','إعادة تثبيت ويندوز','إطفاء كل الأجهزة في الطابق'],a:0,why:'الطابعة سليمة بدليل حالتها، والعطل في الطابور. الحل الأخف هو مسحه وإعادة تشغيل الخدمة.'}}
+];
+
+var SIM=[
+ {t:'تعذر الاتصال في قاعة 204',who:'د. سلمى، أستاذة مساعدة',ch:'هاتف',txt:'أجهزة القاعة 204 كلها بلا إنترنت والمحاضرة تبدأ بعد 20 دقيقة.',
+  root:'العنوان 169.254 على عدة أجهزة يعني أن القاعة فقدت خدمة DHCP، وغالبا بسبب وصلة المحول (switch). القرار الصحيح هو التصعيد مع المعلومات الكاملة.',
+  steps:[
+   {skill:'method',q:'ما أول إجراء تشخيصي مناسب؟',o:[
+    {t:'إعادة تثبيت نظام التشغيل على أحد الأجهزة',ok:0,fb:'إجراء ثقيل قبل معرفة نطاق المشكلة.'},
+    {t:'تحديد النطاق: هل كل الأجهزة متأثرة وهل الكابل أو الواي فاي يعمل؟',ok:1,fb:'تحديد النطاق يفرّق بين عطل جهاز وعطل شبكة.'},
+    {t:'طلب تأجيل المحاضرة',ok:0,fb:'سابق لأوانه، فلم تشخص بعد.'}]},
+   {skill:'net',q:'أظهر ipconfig على ثلاثة أجهزة العنوان 169.254.x.x. ما التفسير؟',o:[
+    {t:'الأجهزة لم تحصل على عنوان من خادم DHCP',ok:1,fb:'هذا عنوان APIPA يعطيه الجهاز لنفسه عند فشل DHCP.'},
+    {t:'خادم DNS بطيء',ok:0,fb:'DNS يأتي بعد حصول الجهاز على عنوان صحيح.'},
+    {t:'كلمات مرور الحسابات منتهية',ok:0,fb:'كلمة المرور لا تؤثر على العنوان.'}]},
+   {skill:'esc',q:'ما القرار الأنسب؟',o:[
+    {t:'تصعيد لفريق الشبكات مع القاعة وعدد الأجهزة ونتيجة ipconfig والوقت',ok:1,fb:'تصعيد كامل المعلومات يوفر على الفريق وقت إعادة التشخيص.'},
+    {t:'ضبط عناوين يدوية على كل جهاز',ok:0,fb:'قد يسبب تعارض عناوين ولا يعالج السبب.'},
+    {t:'إغلاق البلاغ لأنه خارج اختصاصك',ok:0,fb:'التصعيد مسؤوليتك، وليس إغلاق البلاغ.'}]}]},
+ {t:'حساب أستاذ مقفل مرارا',who:'د. ماجد، كلية الهندسة',ch:'البريد',txt:'غيّرت كلمة المرور أمس وحسابي مقفل مرة أخرى. أحتاج الدخول الآن لرفع الدرجات.',
+  root:'جهاز آخر (الهاتف) يرسل كلمة المرور القديمة. فك القفل وحده لا يكفي، يجب تحديث كلمة المرور على الأجهزة الأخرى.',
+  steps:[
+   {skill:'sec',q:'قبل أي إجراء على الحساب، ماذا تفعل؟',o:[
+    {t:'أفك القفل فورا لأن الأستاذ مستعجل',ok:0,fb:'لا يُنفّذ أي تعديل على حساب قبل التحقق من هوية صاحبه.'},
+    {t:'أتحقق من هويته بالطريقة المعتمدة',ok:1,fb:'التحقق من الهوية خطوة أمنية لا تُتجاوز مهما كان الاستعجال.'},
+    {t:'أطلب منه كلمة مروره لأجرب بنفسي',ok:0,fb:'لا يُطلب من المستخدم كشف كلمة مروره أبدا.'}]},
+   {skill:'method',q:'سجل الدخول يظهر محاولات فاشلة كل 5 دقائق من جهاز محمول. ما التفسير؟',o:[
+    {t:'الهاتف يحاول الدخول بكلمة المرور القديمة',ok:1,fb:'النمط المنتظم من جهاز واحد يشير إلى تطبيق يعيد المحاولة تلقائيا.'},
+    {t:'الحساب تعرض لهجوم من الخارج',ok:0,fb:'الهجوم يأتي عادة من عدة مصادر. هنا مصدر واحد منتظم.'},
+    {t:'خادم المصادقة معطل',ok:0,fb:'غيره يدخل بنجاح، فالخادم سليم.'}]},
+   {skill:'comm',q:'كيف تنهي البلاغ؟',o:[
+    {t:'أفك القفل وأوضح له ما حدث وأطلب تحديث كلمة المرور على هاتفه ثم أوثّق ذلك',ok:1,fb:'يعالج السبب الجذري ويعلّم المستخدم ويحفظ السجل.'},
+    {t:'أفك القفل فقط وأغلق البلاغ',ok:0,fb:'سيتكرر القفل لأن السبب لم يُعالج.'},
+    {t:'أغيّر كلمة المرور وأرسلها له في رسالة نصية',ok:0,fb:'إرسال كلمات المرور في رسائل مخالف للسياسات الأمنية.'}]}]},
+ {t:'طابعة الطابق الثاني',who:'قسم القبول والتسجيل',ch:'تذكرة',txt:'الطابعة المشتركة لا تطبع منذ الصباح. فيها 15 مهمة والموظفون ينتظرون.',
+  root:'الطابعة جاهزة والطابور عالق. المسح وإعادة تشغيل الخدمة يحلان المشكلة دون تصعيد، ويُصعَّد فقط لو ظهر عطل في الجهاز.',
+  steps:[
+   {skill:'hw',q:'ما أول فحص منطقي؟',o:[
+    {t:'النظر إلى شاشة الطابعة وحالتها في الطابور',ok:1,fb:'يحدد هل العطل في الجهاز أم في البرمجيات.'},
+    {t:'استبدال الطابعة بأخرى',ok:0,fb:'مكلف وغير مبرر قبل أي فحص.'},
+    {t:'إعادة تشغيل كل أجهزة القسم',ok:0,fb:'يضيّع وقت الموظفين ولا يستهدف السبب.'}]},
+   {skill:'method',q:'الطابعة «جاهزة» ولا خطأ على الشاشة، وفي الطابور مهام عالقة. ما الإجراء؟',o:[
+    {t:'مسح الطابور وإعادة تشغيل Print Spooler ثم طباعة صفحة اختبار',ok:1,fb:'حل أقل تدخلا ويتبعه تحقق بصفحة اختبار.'},
+    {t:'تصعيد لقسم الصيانة فورا',ok:0,fb:'لا دليل على عطل في الجهاز بعد.'},
+    {t:'تحديث نظام التشغيل في كل الأجهزة',ok:0,fb:'بعيد عن السبب.'}]},
+   {skill:'esc',q:'عادت الطابعة تعمل، لكن انحشار الورق تكرر ثلاث مرات في أسبوع. ما القرار؟',o:[
+    {t:'تصعيد لقسم الصيانة مع تاريخ الأعطال المتكررة',ok:1,fb:'تكرار العطل المادي بعد الفحص الأولي يتطلب فنيا مختصا.'},
+    {t:'تجاهل الأمر لأنها تعمل الآن',ok:0,fb:'العطل المتكرر سيعود، وتجاهله يؤخر الحل.'},
+    {t:'تفكيك الطابعة بنفسك',ok:0,fb:'خارج صلاحياتك وقد يلغي الضمان.'}]}]}
+];
+
+var EXAM=[
+ {skill:'net',t:'يقول طالب إن الواي فاي «متصل» لكن لا يفتح شيئا. على جهازك: ping للبوابة ينجح، وping 8.8.8.8 ينجح، وفتح موقع بالاسم يفشل.',o:['خلل في DNS','كابل الشبكة معطل','حساب الطالب مقفل','بطاقة الواي فاي تالفة']},
+ {skill:'sec',t:'موظفة تقول إنها ضغطت رابطا في رسالة «عاجل من الدعم الفني» وأدخلت كلمة مرورها. ما الإجراء الأنسب؟',o:['تغيير كلمة المرور وإنهاء الجلسات وإبلاغ أمن المعلومات','مطالبتها بتجاهل الأمر','حذف الرسالة من بريدها فقط','إعادة تشغيل جهازها']},
+ {skill:'hw',t:'جهاز العرض في قاعة المحاضرات يظهر «No Signal» عند توصيل لابتوب المحاضر. ما أول فحص؟',o:['مصدر الدخل المحدد في الجهاز والكابل وإعدادات العرض في اللابتوب','استبدال جهاز العرض','تحديث نظام اللابتوب','فتح تذكرة للمورد']},
+ {skill:'esc',t:'تعطلت الشبكة في المبنى بالكامل، ومعها أنظمة التسجيل. ما التصرف الصحيح؟',o:['تصعيد فوري لعمليات الشبكات مع إبلاغ المشرف وتوثيق النطاق','محاولة إصلاح المحولات بنفسك','انتظار بلاغات أكثر للتأكد','إعادة تشغيل أجهزة الموظفين واحدا واحدا']},
+ {skill:'comm',t:'مستفيد غاضب لأن بلاغه مفتوح منذ يومين ولم يتلق ردا. ما أفضل استجابة؟',o:['الاعتراف بالتأخير، وذكر حالة البلاغ، وتحديد موعد واضح للمتابعة','شرح أن الضغط كبير على القسم','طلب الصبر دون تفاصيل','تحويله إلى مشرفك مباشرة دون رد']},
+ {skill:'hw',t:'الطابعة تعرض «انحشار ورق» رغم أنك أزلت كل الورق ونظفت المسار مرتين. ما الخطوة التالية؟',o:['تصعيد لقسم الصيانة لاحتمال عطل في المستشعر أو الأسطوانة','إعادة تثبيت برنامج التعريف','إطفاء الطابعة لساعة','تغيير نوع الورق للمرة الثالثة']},
+ {skill:'method',t:'جهاز بطيء جدا. ما أنسب بداية للتشخيص؟',o:['Task Manager لمعرفة ما يستهلك المعالج والذاكرة والقرص','إعادة تثبيت ويندوز','استبدال الجهاز','حذف ملفات المستخدم']},
+ {skill:'sec',t:'مستخدم يتصل ويطلب إعادة تعيين كلمة مرور زميله «لأنه في إجازة وعنده عمل عاجل». ما الصواب؟',o:['الرفض وتوجيه الزميل صاحب الحساب أو مديره للطلب عبر القناة المعتمدة','التنفيذ لأن السبب مقنع','طلب بريد الزميل ثم التنفيذ','إرسال كلمة المرور الجديدة للمتصل']},
+ {skill:'net',t:'ثلاثة معامل في الطابق نفسه ظهر فيها العنوان 169.254 على كل الأجهزة. وبقية الطوابق سليمة. ما الأرجح؟',o:['انقطاع DHCP أو وصلة المحول الخاص بذلك الطابق','كل الأجهزة قديمة','خلل في برنامج مكافحة الفيروسات','كلمات المرور انتهت']}
+];
+
+/* ============ حالة ============ */
+var S={phase:1,topic:0,quiz:{},sim:{i:null,s:0,picked:null,res:{},fin:{}},lab:null,labDone:false,labRes:[],ex:null,exRes:null,viewed:false};
+var $=function(s,r){return (r||document).querySelector(s)};
+var A=[];
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function list(a,tag){tag=tag||'ul';return '<'+tag+'>'+a.map(function(x){return '<li>'+x+'</li>'}).join('')+'</'+tag+'>'}
+
+function isDone(n){
+  if(n===1)return Object.keys(S.quiz).length===TOPICS.length;
+  if(n===2)return Object.keys(S.sim.fin).length===SIM.length;
+  if(n===3)return S.labDone;
+  if(n===4)return !!S.exRes;
+  if(n===5)return S.viewed;
+}
+
+/* ============ تنقل ============ */
+function renderNav(){
+  var d=0;
+  $('#nav').innerHTML=PH.map(function(p){
+    var dn=isDone(p.n);if(dn)d++;
+    return '<button class="ph'+(dn?' done':'')+'" data-p="'+p.n+'" '+(S.phase===p.n?'aria-current="true"':'')+'><span class="n">'+(dn?'✓':p.n)+'</span><span><b>'+p.t+'</b><span class="s">'+p.s+'</span></span></button>';
+  }).join('');
+  $('#ovtxt').textContent='التقدم العام: '+d+' من 5 مراحل';
+  $('#ovbar').style.width=(d*20)+'%';
+  [].forEach.call(document.querySelectorAll('.ph'),function(b){b.onclick=function(){go(+b.dataset.p)}});
+}
+function go(n){S.phase=n;renderNav();[null,r1,r2,r3,r4,r5][n]();window.scrollTo({top:0,behavior:'smooth'})}
+
+/* ============ رسوم متحركة ============ */
+function svg(kind){
+  if(kind==='wifi')return '<svg viewBox="0 0 320 160" role="img" aria-label="نقطة وصول وجهاز طالب">'+
+   '<rect class="box-f" x="30" y="96" width="90" height="28" rx="6"/><circle class="acc" cx="46" cy="110" r="3.5"/>'+
+   '<line class="ln" x1="75" y1="96" x2="75" y2="80"/>'+
+   '<path class="arc" d="M65.1 72.1 A14 14 0 0 1 84.9 72.1"/><path class="arc a2" d="M55.2 62.2 A28 28 0 0 1 94.8 62.2"/><path class="arc a3" d="M45.3 52.3 A42 42 0 0 1 104.7 52.3"/>'+
+   '<line class="dash" x1="125" y1="110" x2="215" y2="110"/>'+
+   '<rect class="box-f" x="220" y="82" width="76" height="46" rx="5"/><line class="ln" x1="212" y1="134" x2="304" y2="134"/>'+
+   '<circle class="bad blink" cx="296" cy="80" r="12"/><text class="w" x="296" y="85">!</text>'+
+   '<text x="75" y="152">نقطة الوصول</text><text x="258" y="152">جهاز الطالب</text></svg>';
+  if(kind==='lock')return '<svg viewBox="0 0 320 160" role="img" aria-label="قفل حساب">'+
+   '<path class="ln" d="M142 64 v-14 a18 18 0 0 1 36 0 v14"/><rect class="box-f" x="130" y="64" width="60" height="52" rx="8"/>'+
+   '<circle class="acc" cx="160" cy="86" r="6"/><rect class="acc" x="157" y="88" width="6" height="14" rx="2"/>'+
+   '<g class="key"><circle class="box-f" cx="40" cy="90" r="9"/><line class="ln" x1="49" y1="90" x2="76" y2="90"/><line class="ln" x1="66" y1="90" x2="66" y2="98"/></g>'+
+   '<rect class="bad blink" x="206" y="70" width="92" height="30" rx="8"/><text class="w" x="252" y="90">محاولات 3/3</text>'+
+   '<text x="160" y="146">الحساب مقفل</text></svg>';
+  if(kind==='printer')return '<svg viewBox="0 0 320 160" role="img" aria-label="طابعة وطابور">'+
+   '<rect class="box-f" x="60" y="40" width="80" height="24" rx="4"/>'+
+   '<rect class="box-f" x="40" y="64" width="120" height="50" rx="8"/><circle class="goodf" cx="58" cy="80" r="4"/>'+
+   '<g class="paper"><rect class="box-f" x="72" y="98" width="56" height="36" rx="2"/><line class="ln" x1="80" y1="110" x2="120" y2="110"/><line class="ln" x1="80" y1="120" x2="110" y2="120"/></g>'+
+   '<rect class="box-f" x="196" y="30" width="96" height="16" rx="3"/><rect class="box-f" x="196" y="52" width="96" height="16" rx="3"/>'+
+   '<rect class="bad blink" x="196" y="74" width="96" height="16" rx="3"/><rect class="box-f" x="196" y="96" width="96" height="16" rx="3"/>'+
+   '<text x="244" y="132">طابور عالق</text><text x="100" y="152">الحالة: جاهزة</text></svg>';
+  return '<svg viewBox="0 0 320 130" role="img" aria-label="رحلة حزمة بيانات">'+
+   '<line class="dash" x1="40" y1="56" x2="280" y2="56"/>'+
+   [40,120,200,280].map(function(x){return '<circle class="box-f" cx="'+x+'" cy="56" r="17"/>'}).join('')+
+   '<circle class="pkt" cx="40" cy="56" r="5"/><circle class="pkt p2" cx="40" cy="56" r="5"/>'+
+   '<text x="40" y="100">الجهاز</text><text x="120" y="100">البوابة</text><text x="200" y="100">DNS</text><text x="280" y="100">الموقع</text></svg>';
+}
+
+/* ============ المرحلة 1 ============ */
+function r1(){
+  var t=TOPICS[S.topic],q=t.quiz,ans=S.quiz[t.id];
+  $('#view').innerHTML='<div class="stack">'+
+   '<div><h2>المرحلة الأولى: التعلم النظري</h2><p class="lead">أربعة أعطال شائعة. لكل عطل رسم متحرك وأعراض وأسباب وخطوات ومثال وسؤال سريع.</p></div>'+
+   '<div class="tabs" role="tablist">'+TOPICS.map(function(x,i){return '<button class="tab" role="tab" data-t="'+i+'" aria-selected="'+(i===S.topic)+'">'+x.t+(S.quiz[x.id]?'<span class="ok">✓</span>':'')+'</button>'}).join('')+'</div>'+
+   '<div class="grid2"><figure class="anim">'+svg(t.anim)+'<figcaption>'+t.cap+'</figcaption></figure>'+
+   '<div class="box"><h3>مثال واقعي</h3><p>'+t.ex+'</p></div></div>'+
+   '<div class="grid2">'+
+    '<div class="box"><h3>الأعراض</h3>'+list(t.sym)+'</div>'+
+    '<div class="box"><h3>الأسباب الشائعة</h3>'+list(t.cause)+'</div>'+
+    '<div class="box"><h3>المصطلحات</h3>'+list(t.terms.map(function(m){return '<b dir="ltr">'+m[0]+'</b>: '+m[1]}))+'</div>'+
+    '<div class="box"><h3>أدوات التشخيص</h3><div class="row">'+t.tools.map(function(x){return '<span class="chip" dir="auto">'+x+'</span>'}).join('')+'</div></div>'+
+    '<div class="box"><h3>خطوات التشخيص</h3>'+list(t.steps,'ol')+'</div>'+
+    '<div class="box"><h3>متى تصعّد؟</h3><p>'+t.esc+'</p></div>'+
+   '</div>'+
+   '<div class="box"><h3>سؤال سريع</h3><p style="margin-bottom:8px">'+q.q+'</p><div class="opts">'+q.o.map(function(o,i){
+      var c='opt';if(ans!==undefined){if(i===q.a)c+=' good';else if(i===ans.p)c+=' bad'}
+      return '<button class="'+c+'" data-o="'+i+'" '+(ans!==undefined?'disabled':'')+'>'+o+'</button>'}).join('')+'</div>'+
+    (ans!==undefined?'<div class="fb '+(ans.ok?'good':'bad')+'" style="margin-top:10px"><b>'+(ans.ok?'إجابة صحيحة. ':'ليست الإجابة الأنسب. ')+'</b>'+q.why+'</div>':'')+'</div>'+
+   '<div class="row"><span class="prog">أجبت عن '+Object.keys(S.quiz).length+' من '+TOPICS.length+' أسئلة</span>'+
+    (isDone(1)?'<button class="btn" id="nx">انتقل إلى المحاكاة</button>':'')+'</div></div>';
+  [].forEach.call(document.querySelectorAll('.tab'),function(b){b.onclick=function(){S.topic=+b.dataset.t;r1()}});
+  [].forEach.call(document.querySelectorAll('.opt'),function(b){b.onclick=function(){var i=+b.dataset.o;S.quiz[t.id]={p:i,ok:i===q.a};renderNav();r1()}});
+  if($('#nx'))$('#nx').onclick=function(){go(2)};
+}
+
+/* ============ المرحلة 2 ============ */
+function r2(){
+  var v=$('#view');
+  if(S.sim.i===null){
+    v.innerHTML='<div class="stack"><div><h2>المرحلة الثانية: المحاكاة التفاعلية</h2><p class="lead">بلاغات افتراضية تحاكي بيئة الجامعة. تختار الإجراء في كل خطوة فتظهر النتيجة والتعليل فورا.</p></div>'+
+     '<div class="grid2">'+SIM.map(function(s,i){var f=S.sim.fin[i];var sc=f?S.sim.res[i].filter(function(r){return r.ok}).length:0;
+       return '<div class="box"><h3>'+s.t+'</h3><p style="font-size:.9rem;color:var(--muted)">'+s.who+'</p><div class="row" style="margin-top:10px"><button class="btn'+(f?' alt':'')+'" data-s="'+i+'">'+(f?'إعادة المحاولة':'ابدأ البلاغ')+'</button>'+(f?'<span class="prog">النتيجة '+sc+' من 3</span>':'')+'</div></div>'}).join('')+'</div>'+
+     (isDone(2)?'<div class="row"><button class="btn" id="nx">انتقل إلى التدريب العملي</button></div>':'')+'</div>';
+    [].forEach.call(document.querySelectorAll('[data-s]'),function(b){b.onclick=function(){S.sim.i=+b.dataset.s;S.sim.s=0;S.sim.picked=null;S.sim.res[S.sim.i]=[];r2()}});
+    if($('#nx'))$('#nx').onclick=function(){go(3)};
+    return;
+  }
+  var sc=SIM[S.sim.i];
+  if(S.sim.s>=3){
+    var res=S.sim.res[S.sim.i],n=res.filter(function(r){return r.ok}).length;S.sim.fin[S.sim.i]=true;renderNav();
+    v.innerHTML='<div class="stack"><h2>انتهى البلاغ: '+sc.t+'</h2><div class="fb '+(n===3?'good':'info')+'"><b>النتيجة '+n+' من 3.</b> '+sc.root+'</div>'+
+      '<div class="row"><button class="btn" id="bk">العودة إلى البلاغات</button></div></div>';
+    $('#bk').onclick=function(){S.sim.i=null;r2()};return;
+  }
+  var st=sc.steps[S.sim.s],p=S.sim.picked;
+  v.innerHTML='<div class="stack"><div class="row" style="justify-content:space-between"><h2>'+sc.t+'</h2><span class="prog">الخطوة '+(S.sim.s+1)+' من 3</span></div>'+
+   '<div class="ticket"><div class="meta"><span>TICKET #'+(2040+S.sim.i)+'</span><span>'+sc.ch+'</span></div><b>'+sc.who+'</b><q>'+sc.txt+'</q></div>'+
+   '<h3>'+st.q+'</h3><div class="opts">'+st.o.map(function(o,i){var c='opt';if(p!==null){if(o.ok)c+=' good';else if(i===p)c+=' bad'}return '<button class="'+c+'" data-o="'+i+'" '+(p!==null?'disabled':'')+'>'+o.t+'</button>'}).join('')+'</div>'+
+   (p!==null?'<div class="fb '+(st.o[p].ok?'good':'bad')+'"><b>'+(st.o[p].ok?'قرار سليم. ':'قرار غير مناسب. ')+'</b>'+st.o[p].fb+(st.o[p].ok?'':' الإجابة الأنسب: '+st.o.filter(function(o){return o.ok})[0].t+'.')+'</div><div class="row"><button class="btn" id="nx">'+(S.sim.s<2?'الخطوة التالية':'إنهاء البلاغ')+'</button></div>':'')+'</div>';
+  [].forEach.call(document.querySelectorAll('.opt'),function(b){b.onclick=function(){var i=+b.dataset.o;S.sim.picked=i;S.sim.res[S.sim.i].push({skill:st.skill,ok:!!st.o[i].ok});r2()}});
+  if($('#nx'))$('#nx').onclick=function(){S.sim.s++;S.sim.picked=null;r2()};
+}
+
+/* ============ المرحلة 3 ============ */
+var OBJ=[['ip','قراءة إعدادات الشبكة بالأمر ipconfig'],['loop','فحص بطاقة الشبكة: ping 127.0.0.1'],['gw','فحص البوابة: ping 10.20.4.1'],['cable','فحص الكابل (زر الفحص المادي)'],['renew','تجديد العنوان: ipconfig /renew'],['net','فحص الإنترنت: ping 8.8.8.8'],['dns','فحص DNS: nslookup portal.univ.edu']];
+var HINTS={ip:'ابدأ بقراءة الإعدادات: اكتب ipconfig',loop:'افحص بطاقة الشبكة نفسها: ping 127.0.0.1',gw:'افحص الوصول للبوابة: ping 10.20.4.1',cable:'العنوان 169.254 يعني أن الجهاز لم يجد خادم DHCP. اضغط «فحص الكابل».',renew:'بعد إصلاح الكابل اطلب عنوانا جديدا: ipconfig /renew',net:'اختبر الخروج للإنترنت: ping 8.8.8.8',dns:'اختبر الأسماء: nslookup portal.univ.edu'};
+function newLab(){return {cable:false,fixed:false,ob:{},hints:0,log:[['p','جهاز افتراضي PC-LAB-07. البلاغ: «لا يوجد إنترنت». اكتب help لعرض الأوامر.']]}}
+function out(t,c){S.lab.log.push([c||'',t])}
+function labCmd(raw){
+  var L=S.lab,c=raw.trim().toLowerCase().replace(/\s+/g,' ');L.log.push(['p','C:\\> '+raw]);
+  if(!c)return;
+  if(c==='help')out('الأوامر: ipconfig | ipconfig /renew | ping <عنوان> | nslookup <اسم> | clear');
+  else if(c==='clear'){L.log=[]}
+  else if(c==='ipconfig'||c==='ipconfig /all'){L.ob.ip=1;
+    out(L.fixed?'Ethernet adapter:\n   IPv4 Address . . . : 10.20.4.57\n   Subnet Mask  . . . : 255.255.255.0\n   Default Gateway  . : 10.20.4.1\n   DNS Servers  . . . : 10.20.0.10':'Ethernet adapter:\n   Autoconfiguration IPv4 Address : 169.254.33.12\n   Subnet Mask  . . . : 255.255.0.0\n   Default Gateway  . : (فارغ)\n   DNS Servers  . . . : (فارغ)')}
+  else if(c==='ping 127.0.0.1'||c==='ping localhost'){L.ob.loop=1;out('Reply from 127.0.0.1: time<1ms\nبطاقة الشبكة وحزمة TCP/IP تعملان.','okc')}
+  else if(c==='ping 10.20.4.1'){if(L.fixed){L.ob.gw=1;out('Reply from 10.20.4.1: time=2ms\nالبوابة تستجيب.','okc')}else{out('Destination host unreachable.\nالجهاز بلا عنوان صحيح، فلا يصل للبوابة.','er')}}
+  else if(c==='ping 8.8.8.8'){if(L.fixed){L.ob.net=1;out('Reply from 8.8.8.8: time=14ms\nالخروج إلى الإنترنت سليم.','okc')}else out('General failure.','er')}
+  else if(c==='ipconfig /renew'){if(!L.cable){out('فشل: Media disconnected. لا توجد وصلة فيزيائية، فلا يمكن للجهاز الوصول إلى DHCP.','er')}else{L.fixed=true;L.ob.renew=1;out('تم الحصول على عنوان جديد: 10.20.4.57','okc')}}
+  else if(c==='nslookup portal.univ.edu'||c==='nslookup'){if(L.fixed){L.ob.dns=1;out('Server: dns1.univ.edu (10.20.0.10)\nName:   portal.univ.edu\nAddress: 10.20.0.45','okc')}else out('DNS request timed out.','er')}
+  else if(c.indexOf('ping ')===0)out('Request timed out.','er');
+  else out('أمر غير معروف. اكتب help.','er');
+  checkLab();
+}
+function checkLab(){
+  var all=OBJ.every(function(o){return S.lab.ob[o[0]]});
+  if(all&&!S.labDone){S.labDone=true;S.labRes=[{skill:'net',ok:true},{skill:'method',ok:S.lab.hints<=1}];renderNav()}
+}
+function r3(){
+  if(!S.lab)S.lab=newLab();
+  var L=S.lab;
+  $('#view').innerHTML='<div class="stack"><div><h2>المرحلة الثالثة: التدريب العملي</h2><p class="lead">جهاز افتراضي آمن. لن تتأثر أي أجهزة حقيقية. أنجز الأهداف السبعة بالتسلسل المنطقي.</p></div>'+
+   '<div class="grid2"><div class="stack" style="min-width:0"><div class="term" id="term" tabindex="0" aria-label="الطرفية"></div>'+
+    '<form class="cmdline" id="f"><input id="cmd" autocomplete="off" spellcheck="false" placeholder="اكتب الأمر هنا" aria-label="الأمر"><button class="btn" type="submit">تنفيذ</button></form>'+
+    '<div class="row" style="direction:ltr;justify-content:flex-start">'+['ipconfig','ping 127.0.0.1','ping 10.20.4.1','ipconfig /renew','ping 8.8.8.8','nslookup portal.univ.edu'].map(function(x){return '<button class="chip q" type="button" style="cursor:pointer;font-family:var(--f-mono)">'+x+'</button>'}).join('')+'</div></div>'+
+    '<div class="stack"><div class="box"><h3>الأهداف</h3><ul class="chk">'+OBJ.map(function(o){return '<li class="'+(L.ob[o[0]]?'on':'')+'"><i>'+(L.ob[o[0]]?'✓':'')+'</i><span>'+o[1]+'</span></li>'}).join('')+'</ul></div>'+
+    '<div class="row"><button class="btn alt" id="cab">فحص الكابل</button><button class="btn alt" id="hint">تلميح</button><button class="btn alt" id="rst">إعادة الضبط</button></div>'+
+    '<div id="hbox"></div>'+
+    (S.labDone?'<div class="fb good"><b>أنجزت التدريب.</b> المشكلة كانت وصلة فيزيائية مفصولة، وتتبعت السبب من العنوان 169.254 إلى الإصلاح. '+(L.hints>1?'استخدمت '+L.hints+' تلميحات.':'')+'</div><button class="btn" id="nx">انتقل إلى الاختبار</button>':'')+'</div></div></div>';
+  var term=$('#term');
+  term.innerHTML=L.log.map(function(l){return '<div class="'+(l[0]||'')+'">'+l[1].replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>'}).join('');
+  term.scrollTop=term.scrollHeight;
+  $('#f').onsubmit=function(e){e.preventDefault();var v=$('#cmd').value;labCmd(v);r3();$('#cmd').focus()};
+  [].forEach.call(document.querySelectorAll('.q'),function(b){b.onclick=function(){labCmd(b.textContent);r3()}});
+  $('#cab').onclick=function(){
+    out('فحص مادي: كابل الشبكة مفصول جزئيا من المنفذ. تمت إعادة توصيله.','okc');L.cable=true;L.ob.cable=1;checkLab();r3()};
+  $('#hint').onclick=function(){
+    var n=OBJ.filter(function(o){return !L.ob[o[0]]})[0];if(!n){return}
+    L.hints++;$('#hbox').innerHTML='<div class="fb info">'+HINTS[n[0]]+'</div>'};
+  $('#rst').onclick=function(){S.lab=newLab();S.labDone=false;S.labRes=[];renderNav();r3()};
+  if($('#nx'))$('#nx').onclick=function(){go(4)};
+}
+
+/* ============ المرحلة 4 ============ */
+function r4(){
+  var v=$('#view'),E=S.ex;
+  if(S.exRes&&!E){
+    v.innerHTML='<div class="stack"><h2>تم تسليم الاختبار</h2><p class="lead">لا تُعرض الإجابات الصحيحة. ستجد نتيجتك حسب المهارة في تقرير الجاهزية.</p><div class="row"><button class="btn" id="nx">عرض التقرير</button><button class="btn alt" id="re">إعادة الاختبار بترتيب جديد</button></div></div>';
+    $('#nx').onclick=function(){go(5)};$('#re').onclick=function(){S.exRes=null;renderNav();r4()};return;
+  }
+  if(!E){
+    v.innerHTML='<div class="stack"><div><h2>المرحلة الرابعة: الاختبار والتقييم</h2><p class="lead">'+EXAM.length+' سيناريوهات مفاجئة بترتيب عشوائي. لا تظهر نتيجة أي سؤال ولا الحل أثناء الاختبار، لأن المقصود قياس قدرتك على التشخيص واتخاذ القرار بنفسك.</p></div>'+
+     '<div class="fb info">لا تلميحات ولا رجوع للمراحل السابقة أثناء الاختبار. الزمن مفتوح.</div><div class="row"><button class="btn" id="go">ابدأ الاختبار</button></div></div>';
+    $('#go').onclick=function(){S.ex={i:0,qs:shuffle(EXAM).map(function(q){return {skill:q.skill,t:q.t,o:shuffle(q.o.map(function(x,i){return {t:x,ok:i===0}}))}}),a:[],sel:null};r4()};return;
+  }
+  var q=E.qs[E.i];
+  v.innerHTML='<div class="stack"><div class="row" style="justify-content:space-between"><h2>سيناريو '+(E.i+1)+' من '+E.qs.length+'</h2><span class="prog">'+SK[q.skill]+'</span></div>'+
+   '<div class="meter"><i style="width:'+(E.i/E.qs.length*100)+'%"></i></div>'+
+   '<div class="ticket"><q>'+q.t+'</q></div>'+
+   '<div class="opts">'+q.o.map(function(o,i){return '<button class="opt'+(E.sel===i?' sel':'')+'" data-o="'+i+'">'+o.t+'</button>'}).join('')+'</div>'+
+   '<div class="row"><button class="btn" id="nx" '+(E.sel===null?'disabled':'')+'>'+(E.i<E.qs.length-1?'التالي':'تسليم الاختبار')+'</button></div></div>';
+  [].forEach.call(document.querySelectorAll('.opt'),function(b){b.onclick=function(){E.sel=+b.dataset.o;r4()}});
+  $('#nx').onclick=function(){
+    E.a.push({skill:q.skill,ok:q.o[E.sel].ok});E.sel=null;E.i++;
+    if(E.i>=E.qs.length){S.exRes=E.a;S.ex=null;renderNav()}
+    r4();
+  };
+}
+
+/* ============ المرحلة 5 ============ */
+function calc(){
+  var acc={};Object.keys(SK).forEach(function(k){acc[k]={w:0,s:0}});
+  function add(a,w){a.forEach(function(r){var x=acc[r.skill];x.w+=w;if(r.ok)x.s+=w})}
+  add(Object.keys(S.quiz).map(function(id){var t=TOPICS.filter(function(x){return x.id===id})[0];return {skill:t.quiz.skill,ok:S.quiz[id].ok}}),0.5);
+  Object.keys(S.sim.res).forEach(function(i){if(S.sim.fin[i])add(S.sim.res[i],1.5)});
+  add(S.labRes,1.5);
+  if(S.exRes)add(S.exRes,2);
+  var out={};Object.keys(acc).forEach(function(k){out[k]=acc[k].w?Math.round(acc[k].s/acc[k].w*100):null});
+  return out;
+}
+function lvl(p){if(p===null)return ['لم يُقيَّم','var(--muted)','pill-w'];if(p>=80)return ['متقن','var(--good)','pill-g'];if(p>=50)return ['يحتاج تطويرا','var(--warn)','pill-w'];return ['ضعيف','var(--bad)','pill-b']}
+var TOPICOF={net:'الاتصال بالشبكة والواي فاي',sec:'الحسابات والأمن (الموضوع الثالث)',hw:'الطابعات والأجهزة (الموضوع الرابع)',method:'خطوات التشخيص في كل المواضيع',comm:'سيناريوهات التواصل في المحاكاة',esc:'فقرات «متى تصعّد؟» في كل موضوع'};
+function r5(){
+  S.viewed=true;renderNav();
+  var sc=calc(),ks=Object.keys(SK),vals=ks.map(function(k){return sc[k]}).filter(function(x){return x!==null});
+  var avg=vals.length?Math.round(vals.reduce(function(a,b){return a+b},0)/vals.length):0;
+  var phasesDone=[1,2,3,4].every(isDone);
+  var low=ks.filter(function(k){return sc[k]!==null&&sc[k]<50});
+  var ready=phasesDone&&avg>=75&&!low.length&&vals.length===ks.length;
+  var strong=ks.filter(function(k){return sc[k]!==null&&sc[k]>=80}),dev=ks.filter(function(k){return sc[k]===null||sc[k]<80});
+  var d=new Date().toLocaleDateString('ar-AE',{year:'numeric',month:'long',day:'numeric'});
+  $('#view').innerHTML='<div class="stack"><div class="row" style="justify-content:space-between"><div><h2>المرحلة الخامسة: تقرير الجاهزية</h2><p class="lead">تاريخ التقرير: '+d+'</p></div></div>'+
+   '<div class="verdict '+(ready?'ready':'notyet')+'"><h3>'+(ready?'جاهز للعمل المستقل':'غير جاهز بعد للعمل المستقل')+'</h3><p>المعدل العام '+avg+'%. '+
+     (ready?'أتممت المراحل الأربع وحققت مستوى مقبولا في كل المهارات.':(!phasesDone?'لم تُنجز كل المراحل بعد. أكملها ليكتمل التقييم.':low.length?'توجد مهارات دون 50%: '+low.map(function(k){return SK[k]}).join('، ')+'.':'يلزم معدل عام لا يقل عن 75% مع تقييم كل المهارات.'))+'</p></div>'+
+   '<div class="skills">'+ks.map(function(k){var p=sc[k],l=lvl(p);return '<div class="sk"><b>'+SK[k]+'</b><div class="b"><i style="width:'+(p||0)+'%;background:'+l[1]+'"></i></div><span class="lvl '+l[2]+'">'+(p===null?'—':p+'%')+' '+l[0]+'</span></div>'}).join('')+'</div>'+
+   '<div class="grid2"><div class="box"><h3>مهارات أتقنتها</h3>'+(strong.length?list(strong.map(function(k){return SK[k]})):'<p>لا توجد مهارة بلغت 80% بعد.</p>')+'</div>'+
+   '<div class="box"><h3>مهارات تحتاج تطويرا</h3>'+(dev.length?list(dev.map(function(k){return SK[k]+': راجع «'+TOPICOF[k]+'»'})):'<p>لا توجد مهارات تحتاج تطويرا.</p>')+'</div></div>'+
+   '<div class="row"><button class="btn alt" data-g="1">مراجعة النظري</button><button class="btn alt" data-g="2">إعادة المحاكاة</button><button class="btn alt" data-g="4">إعادة الاختبار</button></div></div>';
+  [].forEach.call(document.querySelectorAll('[data-g]'),function(b){b.onclick=function(){if(b.dataset.g==='4'){S.exRes=null;S.ex=null}go(+b.dataset.g)}});
+}
+
+go(1);
+</script>
+
+</body>
+</html>
